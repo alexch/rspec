@@ -30,6 +30,29 @@ module Spec
         example_group
       end
 
+      def example_that_writes_to_stdout
+        Spec::Example::ExampleGroup.describe("writing to stdout") do
+          it "should do something" do
+            puts "o hai"
+          end
+        end
+      end
+
+      it "grabs stdout" do
+        begin
+          formatter_output = StringIO.new
+          options = Options.new(StringIO.new, StringIO.new)
+          formatter = ::Spec::Runner::Formatter::HtmlFormatter.new(options, formatter_output)
+          options.formatters << formatter
+          reporter = Reporter.new(options)
+          formatter.should_receive(:stdout_captured).with("o hai")
+          formatter.should_receive(:stdout_captured).with("\n")
+          reporter.start(1)
+          example_that_writes_to_stdout.run(options)
+        ensure
+          reporter.end
+        end
+      end
       it "should assign itself as the reporter to options" do
         options.reporter.should equal(@reporter)
       end

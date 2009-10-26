@@ -1,4 +1,5 @@
 require 'erb'
+require 'cgi'
 require 'spec/runner/formatter/base_text_formatter'
 require 'spec/runner/formatter/no_op_method_missing'
 
@@ -129,6 +130,11 @@ module Spec
           @output.puts "</div>"
           @output.puts "</body>"
           @output.puts "</html>"
+          @output.flush
+        end
+
+        def stdout_captured(s)
+          @output.puts "<pre class='stdout'>#{CGI.escapeHTML(s)}</pre>"
           @output.flush
         end
 

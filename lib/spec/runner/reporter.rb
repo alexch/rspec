@@ -1,5 +1,25 @@
 module Spec
   module Runner
+
+    class OutputInterceptor
+      def initialize(old_stdout, formatters)
+        @old_stdout = old_stdout
+        @formatters = formatters
+      end
+
+      def write(s)
+        was_output = false
+        @formatters.each do |f|
+          if f.respond_to?(:stdout_captured)
+            f.stdout_captured(s)
+          end
+        end
+        unless was_output
+          @old_stdout.write(s)
+        end
+      end
+    end
+
     class Reporter
       attr_reader :options
       
@@ -46,12 +66,15 @@ module Spec
       end
 
       def start(number_of_examples)
+        @old_stdout = $stdout
+        $stdout = OutputInterceptor.new(@old_stdout, formatters)
         @start_time = Time.new
         formatters.each{|f| f.start(number_of_examples)}
       end
   
       def end
         @end_time = Time.new
+        $stdout = @old_stdout
       end
   
       # Dumps the summary and returns the total number of failures
