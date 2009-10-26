@@ -2,7 +2,7 @@ if Spec::Ruby.version.to_f < 1.9
   begin
     require 'rubygems' unless ENV['NO_RUBYGEMS']
     require 'heckle'
-  rescue LoadError ; raise "You must gem install heckle to use --heckle" ; end
+  rescue LoadError => e ; p e; raise "You must gem install heckle to use --heckle" ; end
 
   module Spec
     module Runner

@@ -108,6 +108,21 @@ module Spec
             html.should =~ /This was a dry-run/m
           end
         end
+
+        it "emits captured stdout lines" do
+          Dir.chdir(root) do
+            args = [
+              'examples/failing/puts_example.rb',
+              '--format',
+              'html',
+            ]
+            err = StringIO.new
+            out = StringIO.new
+            run_with ::Spec::Runner::OptionParser.parse(args, err, out)
+            html = out.string
+            html.should =~ /debugging is &lt;so&gt; fun/m
+          end
+        end
       end
     end
   end
